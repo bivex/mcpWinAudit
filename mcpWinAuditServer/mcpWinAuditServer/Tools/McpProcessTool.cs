@@ -130,7 +130,9 @@ public static class McpProcessTool {
             return result.ErrorMessage; // Error message as string
         }
 
-        IEnumerable<ProcessInfo> allProcesses = result.Processes;
+        // Explicitly cast to List<dynamic> to ensure properties are accessed dynamically
+        // if the runtime environment or framework is causing type information loss.
+        List<dynamic> allProcesses = result.Processes.Cast<dynamic>().ToList();
 
         var topProcesses = allProcesses
             .OrderByDescending ( p => p.TotalProcessorTimeSeconds )
@@ -138,7 +140,7 @@ public static class McpProcessTool {
             .Take ( 15 )
             .ToList();
 
-        return topProcesses; // List of ProcessInfo as object
+        return topProcesses; // List of dynamic as object
     }
 }
 }
