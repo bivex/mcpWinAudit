@@ -1,20 +1,32 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Net.Http.Headers;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using ModelContextProtocol.Server;
 using System.ComponentModel;
 
-var builder = Host.CreateApplicationBuilder(args);
-builder.Logging.AddConsole(consoleLogOptions =>
-{
-    // Configure all logs to go to stderr
-    consoleLogOptions.LogToStandardErrorThreshold = LogLevel.Trace;
-});
-builder.Services
-    .AddMcpServer()
-    .WithTcpServerTransport(5489)
+var builder = Host.CreateEmptyApplicationBuilder(settings: null);
+
+// Create the MCP Server with Standard I/O Transport and Tools from the current assembly
+builder.Services.AddMcpServer()
+    .WithStdioServerTransport()
     .WithToolsFromAssembly();
-await builder.Build().RunAsync();
+
+builder.Logging.AddConsole(options =>
+{
+    options.LogToStandardErrorThreshold = LogLevel.Trace;
+});
+
+builder.Services.AddSingleton(_ =>
+{
+    var client = new HttpClient() { BaseAddress = new Uri("https://api.squiggle.com.au/") };
+    client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("mcp-afl-server", "1.0"));
+    return client;
+});
+
+var app = builder.Build();
+
+await app.RunAsync();
 
 [McpServerToolType]
 public static class EchoTool
