@@ -1,22 +1,9 @@
 using System.ComponentModel;
-using System.Threading.Tasks;
 using ModelContextProtocol.Server;
 using System.Diagnostics;
-using System.Linq;
-using System.Collections.Generic;
-using System;
 using System.Runtime.Versioning;
 
 namespace mcpWinAuditServer.Tools {
-    public struct SystemEventData
-    {
-        public DateTime TimeGenerated { get; set; }
-        public string Source { get; set; }
-        public string EntryType { get; set; }
-        public string Message { get; set; }
-        public long EventID { get; set; }
-    }
-
 [McpServerToolType]
 public static class McpProcessTool {
     [McpServerTool, Description ( "Lists all running processes on the system with performance-related information." )]
@@ -69,7 +56,7 @@ public static class McpProcessTool {
                         ( entry.EntryType == EventLogEntryType.Error ||
                           entry.EntryType == EventLogEntryType.Warning ) )
                 {
-                    events.Add ( new SystemEventData
+                    events.Add ( new
                     {
                         TimeGenerated = entry.TimeGenerated,
                         Source = entry.Source,
