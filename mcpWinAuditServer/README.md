@@ -234,4 +234,27 @@ The starting point for this library was a project called [mcpdotnet](https://git
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE). 
+This project is licensed under the [MIT License](LICENSE).
+
+## Running with Cursor MCP
+
+To integrate and run `mcpWinAuditServer` with Cursor's Model Context Protocol (MCP) functionality, add the following configuration to your Cursor settings (e.g., in `.cursor/mcp.json` or your global Cursor settings):
+
+```json
+"mcpWinAuditServer": {
+      "command": "dotnet",
+      "args": [
+        "run",
+        "--project",
+        "C:\Users\Admin\Desktop\Dev\mcpWinAudit\mcpWinAuditServer\mcpWinAuditServer\mcpWinAuditServer.csproj",
+        "--no-build"
+      ],
+      "env": {
+        "DOTNET_CLI_TELEMETRY_OPTOUT": "1"
+      },
+      "disabled": false,
+      "autoApprove": []
+    }
+```
+
+This configuration tells Cursor how to launch your C# MCP server. Remember to replace the project path with the correct absolute path to your `mcpWinAuditServer.csproj` file. 
