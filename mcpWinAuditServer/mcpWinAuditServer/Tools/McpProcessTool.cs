@@ -142,5 +142,78 @@ public static class McpProcessTool {
 
         return topProcesses; // List of dynamic as object
     }
+
+    [McpServerTool, Description ( "Analyzes the System Event Log for problematic errors and warnings that occurred after the last system startup." )]
+    [SupportedOSPlatform ( "windows" )]
+    public static Task<object> AnalyzeStartupLogsForProblematicEvents()
+    {
+        try
+        {
+            DateTime lastBootTime = DateTime.MinValue;
+            EventLog systemLog = new EventLog ( "System" );
+
+            // Find the last system boot time (Event ID 12 - System Startup)
+            foreach ( EventLogEntry entry in systemLog.Entries.Cast<EventLogEntry>().Reverse() )
+            {
+                if ( entry.Source == "EventLog" && entry.InstanceId == 12 )
+                {
+                    lastBootTime = entry.TimeGenerated;
+                    break;
+                }
+            }
+
+            if ( lastBootTime == DateTime.MinValue )
+            {
+                return Task.FromResult<object> ( "Could not determine last system boot time." );
+            }
+
+            var problematicEvents = new List<SystemEventData>();
+            foreach ( EventLogEntry entry in systemLog.Entries )
+            {
+                if ( entry.TimeGenerated > lastBootTime &&
+                        ( entry.EntryType == EventLogEntryType.Error ||
+                          entry.EntryType == EventLogEntryType.Warning ) )
+                {
+                    problematicEvents.Add ( new SystemEventData
+                    {
+                        TimeGenerated = entry.TimeGenerated,
+                        Source = entry.Source,
+                        EntryType = entry.EntryType.ToString(),
+                        Message = entry.Message,
+                        EventID = entry.InstanceId
+                    } );
+                }
+            }
+            systemLog.Close();
+
+            if ( !problematicEvents.Any() )
+            {
+                return Task.FromResult<object> ( "No problematic events found since last system startup." );
+            }
+
+            var groupedEvents = problematicEvents
+                .GroupBy ( e => new { e.Source, e.EventID } )
+                .Select ( g => new
+                {
+                    Source = g.Key.Source,
+                    EventID = g.Key.EventID,
+                    Count = g.Count(),
+                    LastOccurrence = g.Max ( e => e.TimeGenerated ),
+                    ExampleMessage = g.First().Message // Get an example message for context
+                } )
+                .OrderByDescending ( x => x.Count )
+                .ToList();
+
+            return Task.FromResult<object> ( groupedEvents );
+        }
+        catch ( System.Security.SecurityException )
+        {
+            return Task.FromResult<object> ( "Access Denied: Cannot read System Event Log. Run as administrator." );
+        }
+        catch ( Exception ex )
+        {
+            return Task.FromResult<object> ( $"Error analyzing startup logs: {ex.Message}" );
+        }
+    }
 }
 }
