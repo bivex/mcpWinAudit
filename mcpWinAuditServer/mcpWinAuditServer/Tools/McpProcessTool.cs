@@ -39,7 +39,7 @@ namespace mcpWinAuditServer.Tools {
 [McpServerToolType]
 public static class McpProcessTool {
     [McpServerTool, Description ( "Lists all running processes on the system with performance-related information." )]
-    public static async Task<object> ListAllProcesses()
+    public static async Task<ProcessListResult> ListAllProcesses()
     {
         try
         {
@@ -72,11 +72,11 @@ public static class McpProcessTool {
                 }
             } ).Where ( p => p.HasValue ).Select(p => p.Value).ToList(); // Filter out nulls and get values
 
-            return Task.FromResult<object> ( new ProcessListResult { Success = true, Processes = processes } );
+            return new ProcessListResult { Success = true, Processes = processes };
         }
         catch ( Exception ex )
         {
-            return Task.FromResult<object> ( new ProcessListResult { Success = false, ErrorMessage = $"Error retrieving process list: {ex.Message}" } );
+            return new ProcessListResult { Success = false, ErrorMessage = $"Error retrieving process list: {ex.Message}" };
         }
     }
 
