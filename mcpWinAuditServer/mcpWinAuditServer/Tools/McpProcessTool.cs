@@ -63,14 +63,14 @@ public static class McpProcessTool {
                 catch ( System.InvalidOperationException )
                 {
                     // Process may have exited
-                    return (ProcessInfo?)null; // Return nullable struct
+                    return null; // Return null for class
                 }
                 catch ( System.ComponentModel.Win32Exception )
                 {
                     // Access denied for some process properties
-                    return (ProcessInfo?)null; // Return nullable struct
+                    return null; // Return null for class
                 }
-            } ).Where ( p => p.HasValue ).Select(p => p.Value).ToList(); // Filter out nulls and get values
+            } ).Where ( p => p != null ).ToList(); // Filter out nulls
 
             return new ProcessListResult { Success = true, Processes = processes };
         }
