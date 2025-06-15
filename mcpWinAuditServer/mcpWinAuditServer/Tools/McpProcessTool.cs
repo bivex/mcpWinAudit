@@ -7,39 +7,37 @@ using System.Collections.Generic;
 using System;
 
 namespace mcpWinAuditServer.Tools {
-    public class SystemEventData
-    {
-        public DateTime TimeGenerated { get; set; }
-        public string Source { get; set; }
-        public string EntryType { get; set; }
-        public string Message { get; set; }
-        public long EventID { get; set; }
-    }
+public class SystemEventData {
+    public required DateTime TimeGenerated { get; set; }
+    public required string Source { get; set; }
+    public required string EntryType { get; set; }
+    public required string Message { get; set; }
+    public required long EventID { get; set; }
+}
 
-    public class ProcessInfo
-    {
-        public int Id { get; set; }
-        public string ProcessName { get; set; }
-        public string MainWindowTitle { get; set; }
-        public bool Responding { get; set; }
-        public double WorkingSet64MB { get; set; }
-        public double PrivateMemorySize64MB { get; set; }
-        public int ThreadsCount { get; set; }
-        public int HandleCount { get; set; }
-        public double TotalProcessorTimeSeconds { get; set; }
-    }
+public class ProcessInfo {
+    public required int Id { get; set; }
+    public required string ProcessName { get; set; }
+    public required string MainWindowTitle { get; set; }
+    public required bool Responding { get; set; }
+    public required double WorkingSet64MB { get; set; }
+    public required double PrivateMemorySize64MB { get; set; }
+    public required int ThreadsCount { get; set; }
+    public required int HandleCount { get; set; }
+    public required double TotalProcessorTimeSeconds { get; set; }
+}
 
-    public struct ProcessListResult
-    {
-        public bool Success { get; set; }
-        public string ErrorMessage { get; set; }
-        public IEnumerable<ProcessInfo> Processes { get; set; }
-    }
+public struct ProcessListResult
+{
+    public required bool Success { get; set; }
+    public required string ErrorMessage { get; set; }
+    public required IEnumerable<ProcessInfo> Processes { get; set; }
+}
 
 [McpServerToolType]
 public static class McpProcessTool {
     [McpServerTool, Description ( "Lists all running processes on the system with performance-related information." )]
-    public static async Task<ProcessListResult> ListAllProcesses()
+    public static Task<ProcessListResult> ListAllProcesses()
     {
         try
         {
@@ -70,13 +68,13 @@ public static class McpProcessTool {
                     // Access denied for some process properties
                     return null; // Return null for class
                 }
-            } ).Where ( p => p != null ).ToList(); // Filter out nulls
+            } ).Where ( p => p != null ).Select(p => p!).ToList(); // Filter out nulls and assert non-null
 
-            return new ProcessListResult { Success = true, Processes = processes };
+            return new ProcessListResult { Success = true, Processes = processes, ErrorMessage = string.Empty };
         }
         catch ( Exception ex )
         {
-            return new ProcessListResult { Success = false, ErrorMessage = $"Error retrieving process list: {ex.Message}" };
+            return new ProcessListResult { Success = false, ErrorMessage = $"Error retrieving process list: {ex.Message}", Processes = new List<ProcessInfo>() };
         }
     }
 
@@ -135,10 +133,10 @@ public static class McpProcessTool {
         List<dynamic> allProcesses = result.Processes.Cast<dynamic>().ToList();
 
         var topProcesses = allProcesses
-            .OrderByDescending ( p => p.TotalProcessorTimeSeconds )
-            .ThenByDescending ( p => p.PrivateMemorySize64MB )
-            .Take ( 15 )
-            .ToList();
+                           .OrderByDescending ( p => p.TotalProcessorTimeSeconds )
+                           .ThenByDescending ( p => p.PrivateMemorySize64MB )
+                           .Take ( 15 )
+                           .ToList();
 
         return topProcesses; // List of dynamic as object
     }
@@ -192,17 +190,17 @@ public static class McpProcessTool {
             }
 
             var groupedEvents = problematicEvents
-                .GroupBy ( e => new { e.Source, e.EventID } )
-                .Select ( g => new
-                {
-                    Source = g.Key.Source,
-                    EventID = g.Key.EventID,
-                    Count = g.Count(),
-                    LastOccurrence = g.Max ( e => e.TimeGenerated ),
-                    ExampleMessage = g.First().Message // Get an example message for context
-                } )
-                .OrderByDescending ( x => x.Count )
-                .ToList();
+            .GroupBy ( e => new { e.Source, e.EventID } )
+            .Select ( g => new
+            {
+                Source = g.Key.Source,
+                EventID = g.Key.EventID,
+                Count = g.Count(),
+                LastOccurrence = g.Max ( e => e.TimeGenerated ),
+                ExampleMessage = g.First().Message // Get an example message for context
+            } )
+            .OrderByDescending ( x => x.Count )
+            .ToList();
 
             return Task.FromResult<object> ( groupedEvents );
         }
