@@ -5,27 +5,18 @@ using Microsoft.Extensions.Logging;
 using ModelContextProtocol.Server;
 using System.ComponentModel;
 
-namespace mcpWinAuditServer
+var builder = Host.CreateEmptyApplicationBuilder ( settings: null );
+
+// Create the MCP Server with Standard I/O Transport and Tools from the current assembly
+builder.Services.AddMcpServer()
+.WithStdioServerTransport()
+.WithToolsFromAssembly();
+
+builder.Logging.AddConsole ( options =>
 {
-    internal sealed class Program
-    {
-        static async Task Main(string[] args)
-        {
-            var builder = Host.CreateEmptyApplicationBuilder ( settings: null );
+    options.LogToStandardErrorThreshold = LogLevel.Trace;
+} );
 
-            // Create the MCP Server with Standard I/O Transport and Tools from the current assembly
-            builder.Services.AddMcpServer()
-            .WithStdioServerTransport()
-            .WithToolsFromAssembly();
+var app = builder.Build();
 
-            builder.Logging.AddConsole ( options =>
-            {
-                options.LogToStandardErrorThreshold = LogLevel.Trace;
-            } );
-
-            var app = builder.Build();
-
-            await app.RunAsync();
-        }
-    }
-}
+await app.RunAsync();
