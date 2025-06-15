@@ -42,3 +42,5 @@ CHECKCODE.bat
 
 mcpWinAuditServer/mcpWinAuditServer.ndproj
 mcpWinAuditServer/NDependOut/
+mcpWinAuditServer/NDependOut1/
+mcpWinAuditServer/NDependOut2/
