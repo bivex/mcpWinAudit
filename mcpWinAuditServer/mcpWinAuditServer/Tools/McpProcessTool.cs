@@ -16,11 +16,24 @@ namespace mcpWinAuditServer.Tools {
         public long EventID { get; set; }
     }
 
+    public struct ProcessInfo
+    {
+        public int Id { get; set; }
+        public string ProcessName { get; set; }
+        public string MainWindowTitle { get; set; }
+        public bool Responding { get; set; }
+        public double WorkingSet64MB { get; set; }
+        public double PrivateMemorySize64MB { get; set; }
+        public int ThreadsCount { get; set; }
+        public int HandleCount { get; set; }
+        public double TotalProcessorTimeSeconds { get; set; }
+    }
+
     public struct ProcessListResult
     {
         public bool Success { get; set; }
         public string ErrorMessage { get; set; }
-        public IEnumerable<object> Processes { get; set; }
+        public IEnumerable<ProcessInfo> Processes { get; set; }
     }
 
 [McpServerToolType]
@@ -34,7 +47,7 @@ public static class McpProcessTool {
             {
                 try
                 {
-                    return new
+                    return new ProcessInfo
                     {
                         Id = p.Id,
                         ProcessName = p.ProcessName,
@@ -50,14 +63,14 @@ public static class McpProcessTool {
                 catch ( System.InvalidOperationException )
                 {
                     // Process may have exited
-                    return null;
+                    return (ProcessInfo?)null; // Return nullable struct
                 }
                 catch ( System.ComponentModel.Win32Exception )
                 {
                     // Access denied for some process properties
-                    return null;
+                    return (ProcessInfo?)null; // Return nullable struct
                 }
-            } ).Where ( p => p != null ).ToList(); // Filter out nulls from processes that exited or had access issues
+            } ).Where ( p => p.HasValue ).Select(p => p.Value).ToList(); // Filter out nulls and get values
 
             return Task.FromResult<object> ( new ProcessListResult { Success = true, Processes = processes } );
         }
