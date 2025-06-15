@@ -12,7 +12,7 @@ builder.Logging.AddConsole(consoleLogOptions =>
 });
 builder.Services
     .AddMcpServer()
-    .WithTcpServerTransport(0)
+    .WithTcpServerTransport(5489)
     .WithToolsFromAssembly();
 await builder.Build().RunAsync();
 
