@@ -44,12 +44,12 @@ public static class ProcessTool {
         return Task.FromResult<object> ( processes );
     }
 
-    [McpServerTool, Description ( "Retrieves error and warning events from the System log for the last 31 days." )]
-    [SupportedOSPlatform("windows")]
-    public static Task<object> GetLast31DaysFailedSystemEvents()
+    [McpServerTool, Description ( "Retrieves error and warning events from the System log for the last 1 days." )]
+    [SupportedOSPlatform ( "windows" )]
+    public static Task<object> GetLast1DaysFailedSystemEvents()
     {
         List<object> events = new List<object>();
-        DateTime thirtyOneDaysAgo = DateTime.Now.AddDays ( -31 );
+        DateTime thirtyOneDaysAgo = DateTime.Now.AddDays ( -1 );
 
         try
         {
