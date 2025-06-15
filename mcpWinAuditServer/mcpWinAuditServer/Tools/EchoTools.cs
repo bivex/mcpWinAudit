@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using ModelContextProtocol.Server;
 
-namespace mcp_afl_server.Tools
+namespace mcpWinAuditServer.Tools
 {
     [McpServerToolType]
     public static class EchoTool

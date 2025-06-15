@@ -19,7 +19,7 @@ builder.Logging.AddConsole(options =>
 builder.Services.AddSingleton(_ =>
 {
     var client = new HttpClient() { BaseAddress = new Uri("https://api.squiggle.com.au/") };
-    client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("mcp-afl-server", "1.0"));
+    client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("mcp-win-audit-server", "1.0"));
     return client;
 });
 

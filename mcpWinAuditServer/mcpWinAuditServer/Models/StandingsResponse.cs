@@ -1,4 +1,4 @@
-namespace mcp_afl_server.Models
+namespace mcpWinAuditServer.Models
 {
     public class StandingsResponse
     {
