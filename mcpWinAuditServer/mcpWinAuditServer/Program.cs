@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using ModelContextProtocol.Server;
-using System.ComponentModel;
 
 var builder = Host.CreateEmptyApplicationBuilder(settings: null);
 
@@ -27,10 +26,3 @@ builder.Services.AddSingleton(_ =>
 var app = builder.Build();
 
 await app.RunAsync();
-
-[McpServerToolType]
-public static class EchoTool
-{
-    [McpServerTool, Description("Echoes the message back to the client.")]
-    public static string Echo(string message) => $"hello {message}";
-}
