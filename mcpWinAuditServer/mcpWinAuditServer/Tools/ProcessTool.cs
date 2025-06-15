@@ -18,7 +18,7 @@ namespace mcpWinAuditServer.Tools {
     }
 
 [McpServerToolType]
-public static class ProcessTool {
+public static class McpProcessTool {
     [McpServerTool, Description ( "Lists all running processes on the system with performance-related information." )]
     public static Task<object> ListAllProcesses()
     {
