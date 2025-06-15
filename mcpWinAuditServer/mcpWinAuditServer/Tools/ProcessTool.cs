@@ -8,6 +8,15 @@ using System;
 using System.Runtime.Versioning;
 
 namespace mcpWinAuditServer.Tools {
+    public struct SystemEventData
+    {
+        public DateTime TimeGenerated { get; set; }
+        public string Source { get; set; }
+        public string EntryType { get; set; }
+        public string Message { get; set; }
+        public long EventID { get; set; }
+    }
+
 [McpServerToolType]
 public static class ProcessTool {
     [McpServerTool, Description ( "Lists all running processes on the system with performance-related information." )]
@@ -60,7 +69,7 @@ public static class ProcessTool {
                         ( entry.EntryType == EventLogEntryType.Error ||
                           entry.EntryType == EventLogEntryType.Warning ) )
                 {
-                    events.Add ( new
+                    events.Add ( new SystemEventData
                     {
                         TimeGenerated = entry.TimeGenerated,
                         Source = entry.Source,
