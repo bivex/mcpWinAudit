@@ -5,25 +5,34 @@ using Microsoft.Extensions.Logging;
 using ModelContextProtocol.Server;
 using System.ComponentModel;
 
-var builder = Host.CreateEmptyApplicationBuilder ( settings: null );
-
-// Create the MCP Server with Standard I/O Transport and Tools from the current assembly
-builder.Services.AddMcpServer()
-.WithStdioServerTransport()
-.WithToolsFromAssembly();
-
-builder.Logging.AddConsole ( options =>
+namespace mcpWinAuditServer
 {
-    options.LogToStandardErrorThreshold = LogLevel.Trace;
-} );
+    internal class Program
+    {
+        static async Task Main(string[] args)
+        {
+            var builder = Host.CreateEmptyApplicationBuilder ( settings: null );
 
-var app = builder.Build();
+            // Create the MCP Server with Standard I/O Transport and Tools from the current assembly
+            builder.Services.AddMcpServer()
+            .WithStdioServerTransport()
+            .WithToolsFromAssembly();
 
-await app.RunAsync();
+            builder.Logging.AddConsole ( options =>
+            {
+                options.LogToStandardErrorThreshold = LogLevel.Trace;
+            } );
 
-[McpServerToolType]
-public static class EchoTool
-{
-    [McpServerTool, Description("Echoes the message back to the client.")]
-    public static string Echo(string message) => $"hello {message}";
+            var app = builder.Build();
+
+            await app.RunAsync();
+        }
+    }
+
+    [McpServerToolType]
+    public static class EchoTool
+    {
+        [McpServerTool, Description("Echoes the message back to the client.")]
+        public static string Echo(string message) => $"hello {message}";
+    }
 }
