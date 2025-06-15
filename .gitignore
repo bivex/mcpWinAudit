@@ -1,0 +1,40 @@
+# Visual Studio
+.vs/
+*.com
+*.dll
+*.exe
+*.ilk
+*.lib
+*.obj
+*.pdb
+*.suo
+*.user
+*.aps
+*.bsc
+*.fch
+*.pch
+*.exp
+*.idb
+*.res
+
+# NuGet
+packages/
+*.nuget/
+
+# Rider
+.idea/
+
+# obj and bin folders
+**/[Bb]in/
+**/[Oo]bj/
+
+# Mac
+.DS_Store
+
+# Npm
+node_modules/
+
+# Terraform
+.terraform/
+*.tfplan
+*.tfstate 
