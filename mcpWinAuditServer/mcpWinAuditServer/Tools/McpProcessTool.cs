@@ -2,12 +2,13 @@ using System.ComponentModel;
 using ModelContextProtocol.Server;
 using System.Diagnostics;
 using System.Runtime.Versioning;
+using System.Linq;
 
 namespace mcpWinAuditServer.Tools {
 [McpServerToolType]
 public static class McpProcessTool {
     [McpServerTool, Description ( "Lists all running processes on the system with performance-related information." )]
-    public static Task<object> ListAllProcesses()
+    public static async Task<object> ListAllProcesses()
     {
         var processes = Process.GetProcesses().Select ( p =>
         {
@@ -78,6 +79,25 @@ public static class McpProcessTool {
         }
 
         return Task.FromResult<object> ( events );
+    }
+
+    [McpServerTool, Description ( "Retrieves the top 15 processes impacting system performance based on CPU and memory usage." )]
+    public static async Task<object> GetTop15PerformanceImpactingProcesses()
+    {
+        var allProcesses = await ListAllProcesses() as IEnumerable<dynamic>;
+
+        if ( allProcesses == null )
+        {
+            return "Could not retrieve process data.";
+        }
+
+        var topProcesses = allProcesses
+            .OrderByDescending ( p => p.TotalProcessorTimeSeconds )
+            .ThenByDescending ( p => p.PrivateMemorySize64MB )
+            .Take ( 15 )
+            .ToList();
+
+        return topProcesses;
     }
 }
 }
