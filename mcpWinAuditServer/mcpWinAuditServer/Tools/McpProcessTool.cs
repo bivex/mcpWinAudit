@@ -82,9 +82,9 @@ public static class McpProcessTool {
 
     [McpServerTool, Description ( "Retrieves error and warning events from the System log for the last 1 days." )]
     [SupportedOSPlatform ( "windows" )]
-    public static Task<object> GetLast1DaysFailedSystemEvents()
+    public static Task<List<SystemEventData>> GetLast1DaysFailedSystemEvents()
     {
-        List<object> events = new List<object>();
+        List<SystemEventData> events = new List<SystemEventData>();
         DateTime thirtyOneDaysAgo = DateTime.Now.AddDays ( -1 );
 
         try
@@ -96,7 +96,7 @@ public static class McpProcessTool {
                         ( entry.EntryType == EventLogEntryType.Error ||
                           entry.EntryType == EventLogEntryType.Warning ) )
                 {
-                    events.Add ( new
+                    events.Add ( new SystemEventData
                     {
                         TimeGenerated = entry.TimeGenerated,
                         Source = entry.Source,
@@ -110,24 +110,25 @@ public static class McpProcessTool {
         }
         catch ( System.Security.SecurityException )
         {
-            return Task.FromResult<object> ( "Access Denied: Cannot read System Event Log. Run as administrator." );
+            return Task.FromResult<List<SystemEventData>> ( null ); // Return null or empty list on access denied
         }
         catch ( Exception ex )
         {
-            return Task.FromResult<object> ( $"Error reading System Event Log: {ex.Message}" );
+            // Log the error or handle it appropriately if this is a server tool
+            return Task.FromResult<List<SystemEventData>> ( null ); // Return null or empty list on error
         }
 
-        return Task.FromResult<object> ( events );
+        return Task.FromResult<List<SystemEventData>> ( events );
     }
 
     [McpServerTool, Description ( "Retrieves the top 15 processes impacting system performance based on CPU and memory usage." )]
-    public static async Task<object> GetTop15PerformanceImpactingProcesses()
+    public static async Task<List<ProcessInfo>> GetTop15PerformanceImpactingProcesses()
     {
         ProcessListResult result = await ListAllProcesses();
 
         if ( !result.Success )
         {
-            return result.ErrorMessage;
+            return new List<ProcessInfo>(); // Return empty list on failure
         }
 
         IEnumerable<ProcessInfo> allProcesses = result.Processes;
