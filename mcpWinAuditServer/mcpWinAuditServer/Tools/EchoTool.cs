@@ -1,6 +1,6 @@
 using System.ComponentModel;
 using System.Threading.Tasks;
-using ModelContextProtocol.Tools;
+using ModelContextProtocol.Server;
 
 namespace mcpWinAuditServer.Tools {
 [McpServerToolType]
