@@ -38,3 +38,7 @@ node_modules/
 .terraform/
 *.tfplan
 *.tfstate 
+CHECKCODE.bat
+
+mcpWinAuditServer/mcpWinAuditServer.ndproj
+mcpWinAuditServer/NDependOut/
