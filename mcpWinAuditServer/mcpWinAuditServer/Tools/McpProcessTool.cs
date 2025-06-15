@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System;
 
 namespace mcpWinAuditServer.Tools {
-    public struct SystemEventData
+    public class SystemEventData
     {
         public DateTime TimeGenerated { get; set; }
         public string Source { get; set; }
@@ -123,14 +123,14 @@ public static class McpProcessTool {
     [McpServerTool, Description ( "Retrieves the top 15 processes impacting system performance based on CPU and memory usage." )]
     public static async Task<object> GetTop15PerformanceImpactingProcesses()
     {
-        var result = await ListAllProcesses() as ProcessListResult?;
+        ProcessListResult result = await ListAllProcesses();
 
-        if ( !result.HasValue || !result.Value.Success )
+        if ( !result.Success )
         {
-            return result.HasValue ? result.Value.ErrorMessage : "Could not retrieve process data due to an unknown error.";
+            return result.ErrorMessage;
         }
 
-        var allProcesses = result.Value.Processes;
+        IEnumerable<ProcessInfo> allProcesses = result.Processes;
 
         var topProcesses = allProcesses
             .OrderByDescending ( p => p.TotalProcessorTimeSeconds )
