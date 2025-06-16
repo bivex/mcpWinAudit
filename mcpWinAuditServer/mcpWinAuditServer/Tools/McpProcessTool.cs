@@ -5,6 +5,7 @@ using System.Runtime.Versioning;
 using System.Linq;
 using System.Collections.Generic;
 using System;
+using System.Management;
 
 namespace mcpWinAuditServer.Tools {
 public class SystemEventData {
@@ -148,22 +149,26 @@ public static class McpProcessTool {
         try
         {
             DateTime lastBootTime = DateTime.MinValue;
-            EventLog systemLog = new EventLog ( "System" );
 
-            // Find the last system boot time (Event ID 12 - System Startup)
-            foreach ( EventLogEntry entry in systemLog.Entries.Cast<EventLogEntry>().Reverse() )
+            // Use WMI to get the last boot up time
+            using ( var searcher = new ManagementObjectSearcher ( "SELECT LastBootUpTime FROM Win32_OperatingSystem" ) )
             {
-                if ( entry.Source == "EventLog" && entry.InstanceId == 12 )
+                foreach ( ManagementObject mo in searcher.Get() )
                 {
-                    lastBootTime = entry.TimeGenerated;
-                    break;
+                    if ( mo["LastBootUpTime"] != null )
+                    {
+                        lastBootTime = ManagementDateTimeConverter.ToDateTime ( mo["LastBootUpTime"].ToString() );
+                        break;
+                    }
                 }
             }
 
             if ( lastBootTime == DateTime.MinValue )
             {
-                return Task.FromResult<object> ( "Could not determine last system boot time." );
+                return Task.FromResult<object> ( "Could not determine last system boot time using WMI." );
             }
+
+            EventLog systemLog = new EventLog ( "System" );
 
             var problematicEvents = new List<SystemEventData>();
             foreach ( EventLogEntry entry in systemLog.Entries )
