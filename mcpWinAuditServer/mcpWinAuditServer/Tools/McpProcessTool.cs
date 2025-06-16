@@ -143,7 +143,7 @@ public static class McpProcessTool {
 
     [McpServerTool, Description ( "Analyzes the System Event Log for problematic errors and warnings that occurred after the last system startup." )]
     [SupportedOSPlatform ( "windows" )]
-    public static Task<object> AnalyzeStartupLogsForProblematicEvents()
+    public static Task<object> AnalyzeStartupLogs()
     {
         try
         {
