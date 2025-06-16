@@ -70,11 +70,11 @@ public static class McpProcessTool {
                 }
             } ).Where ( p => p != null ).Select(p => p!).ToList(); // Filter out nulls and assert non-null
 
-            return new ProcessListResult { Success = true, Processes = processes, ErrorMessage = string.Empty };
+            return Task.FromResult(new ProcessListResult { Success = true, Processes = processes, ErrorMessage = string.Empty });
         }
         catch ( Exception ex )
         {
-            return new ProcessListResult { Success = false, ErrorMessage = $"Error retrieving process list: {ex.Message}", Processes = new List<ProcessInfo>() };
+            return Task.FromResult(new ProcessListResult { Success = false, ErrorMessage = $"Error retrieving process list: {ex.Message}", Processes = new List<ProcessInfo>() });
         }
     }
 
