@@ -133,10 +133,10 @@ public static class McpProcessTool {
         List<dynamic> allProcesses = result.Processes.Cast<dynamic>().ToList();
 
         var topProcesses = allProcesses
-                           .OrderByDescending ( p => p.TotalProcessorTimeSeconds )
-                           .ThenByDescending ( p => p.PrivateMemorySize64MB )
-                           .Take ( 15 )
-                           .ToList();
+            .OrderByDescending ( p => p.TotalProcessorTimeSeconds )
+            .ThenByDescending ( p => p.PrivateMemorySize64MB )
+            .Take ( 15 )
+            .ToList();
 
         return topProcesses; // List of dynamic as object
     }
@@ -190,17 +190,17 @@ public static class McpProcessTool {
             }
 
             var groupedEvents = problematicEvents
-            .GroupBy ( e => new { e.Source, e.EventID } )
-            .Select ( g => new
-            {
-                Source = g.Key.Source,
-                EventID = g.Key.EventID,
-                Count = g.Count(),
-                LastOccurrence = g.Max ( e => e.TimeGenerated ),
-                ExampleMessage = g.First().Message // Get an example message for context
-            } )
-            .OrderByDescending ( x => x.Count )
-            .ToList();
+                .GroupBy ( e => new { e.Source, e.EventID } )
+                .Select ( g => new
+                {
+                    Source = g.Key.Source,
+                    EventID = g.Key.EventID,
+                    Count = g.Count(),
+                    LastOccurrence = g.Max ( e => e.TimeGenerated ),
+                    ExampleMessage = g.First().Message // Get an example message for context
+                } )
+                .OrderByDescending ( x => x.Count )
+                .ToList();
 
             return Task.FromResult<object> ( groupedEvents );
         }
