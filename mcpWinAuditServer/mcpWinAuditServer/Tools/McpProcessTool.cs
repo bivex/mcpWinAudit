@@ -69,13 +69,13 @@ public static class McpProcessTool {
                     // Access denied for some process properties
                     return null; // Return null for class
                 }
-            } ).Where ( p => p != null ).Select(p => p!).ToList(); // Filter out nulls and assert non-null
+            } ).Where ( p => p != null ).Select ( p => p! ).ToList(); // Filter out nulls and assert non-null
 
-            return Task.FromResult(new ProcessListResult { Success = true, Processes = processes, ErrorMessage = string.Empty });
+            return Task.FromResult ( new ProcessListResult { Success = true, Processes = processes, ErrorMessage = string.Empty } );
         }
         catch ( Exception ex )
         {
-            return Task.FromResult(new ProcessListResult { Success = false, ErrorMessage = $"Error retrieving process list: {ex.Message}", Processes = new List<ProcessInfo>() });
+            return Task.FromResult ( new ProcessListResult { Success = false, ErrorMessage = $"Error retrieving process list: {ex.Message}", Processes = new List<ProcessInfo>() } );
         }
     }
 
@@ -134,10 +134,10 @@ public static class McpProcessTool {
         List<dynamic> allProcesses = result.Processes.Cast<dynamic>().ToList();
 
         var topProcesses = allProcesses
-            .OrderByDescending ( p => p.TotalProcessorTimeSeconds )
-            .ThenByDescending ( p => p.PrivateMemorySize64MB )
-            .Take ( 15 )
-            .ToList();
+                           .OrderByDescending ( p => p.TotalProcessorTimeSeconds )
+                           .ThenByDescending ( p => p.PrivateMemorySize64MB )
+                           .Take ( 15 )
+                           .ToList();
 
         return topProcesses; // List of dynamic as object
     }
@@ -195,17 +195,17 @@ public static class McpProcessTool {
             }
 
             var groupedEvents = problematicEvents
-                .GroupBy ( e => new { e.Source, e.EventID } )
-                .Select ( g => new
-                {
-                    Source = g.Key.Source,
-                    EventID = g.Key.EventID,
-                    Count = g.Count(),
-                    LastOccurrence = g.Max ( e => e.TimeGenerated ),
-                    ExampleMessage = g.First().Message // Get an example message for context
-                } )
-                .OrderByDescending ( x => x.Count )
-                .ToList();
+            .GroupBy ( e => new { e.Source, e.EventID } )
+            .Select ( g => new
+            {
+                Source = g.Key.Source,
+                EventID = g.Key.EventID,
+                Count = g.Count(),
+                LastOccurrence = g.Max ( e => e.TimeGenerated ),
+                ExampleMessage = g.First().Message // Get an example message for context
+            } )
+            .OrderByDescending ( x => x.Count )
+            .ToList();
 
             return Task.FromResult<object> ( groupedEvents );
         }
