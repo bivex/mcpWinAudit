@@ -192,5 +192,28 @@ namespace mcpWinAuditServer.Tools {
                 return Task.FromResult<object>($"Error retrieving current directory: {ex.Message}");
             }
         }
+
+        [McpServerTool, Description("Moves a directory from a source path to a destination path.")]
+        public static Task<object> MoveDirectory(string sourcePath, string destinationPath)
+        {
+            try
+            {
+                if (!Directory.Exists(sourcePath))
+                {
+                    return Task.FromResult<object>($"Error: Source directory not found at {sourcePath}");
+                }
+
+                Directory.Move(sourcePath, destinationPath);
+                return Task.FromResult<object>($"Directory moved successfully from {sourcePath} to {destinationPath}");
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Task.FromResult<object>($"Access Denied: Cannot move directory. Run as administrator or check permissions for {sourcePath} or {destinationPath}.");
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>($"Error moving directory: {ex.Message}");
+            }
+        }
     }
 } 
