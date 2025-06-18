@@ -123,5 +123,69 @@ namespace mcpWinAuditServer.Tools {
                 return Task.FromResult<object>($"Error checking file permissions: {ex.Message}");
             }
         }
+
+        [McpServerTool, Description("Creates a new directory at the specified path.")]
+        public static Task<object> CreateDirectory(string path)
+        {
+            try
+            {
+                if (Directory.Exists(path))
+                {
+                    return Task.FromResult<object>($"Error: Directory already exists at {path}");
+                }
+
+                Directory.CreateDirectory(path);
+                return Task.FromResult<object>($"Directory created successfully at {path}");
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Task.FromResult<object>($"Access Denied: Cannot create directory at {path}. Run as administrator or check permissions.");
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>($"Error creating directory: {ex.Message}");
+            }
+        }
+
+        [McpServerTool, Description("Deletes a directory at the specified path.")]
+        public static Task<object> DeleteDirectory(string path)
+        {
+            try
+            {
+                if (!Directory.Exists(path))
+                {
+                    return Task.FromResult<object>($"Error: Directory not found at {path}");
+                }
+
+                Directory.Delete(path, true); // The 'true' parameter allows recursive deletion
+                return Task.FromResult<object>($"Directory deleted successfully at {path}");
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Task.FromResult<object>($"Access Denied: Cannot delete directory at {path}. Run as administrator or check permissions.");
+            }
+            catch (IOException ex) when (ex.Message.Contains("The directory is not empty"))
+            {
+                return Task.FromResult<object>($"Error: Directory at {path} is not empty. Cannot delete a non-empty directory without recursive flag (which is enabled by default).");
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>($"Error deleting directory: {ex.Message}");
+            }
+        }
+
+        [McpServerTool, Description("Retrieves the current working directory.")]
+        public static Task<object> GetCurrentDirectory()
+        {
+            try
+            {
+                string currentDirectory = Directory.GetCurrentDirectory();
+                return Task.FromResult<object>(currentDirectory);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<object>($"Error retrieving current directory: {ex.Message}");
+            }
+        }
     }
 } 
