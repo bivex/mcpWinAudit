@@ -14,7 +14,7 @@ namespace mcpWinAuditServer.Tools {
     [McpServerToolType]
     public static class McpFileTool {
 
-        [McpServerTool, Description("Lists files in a directory. Optionally, lists files recursively.")]
+        [McpServerTool, Description("Lists files and directories in a directory. Optionally, lists recursively.")]
         public static Task<object> ListFiles(string path, bool recursive = false)
         {
             try
@@ -25,10 +25,15 @@ namespace mcpWinAuditServer.Tools {
                 }
 
                 var searchOption = recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
+                
                 var files = Directory.GetFiles(path, "*", searchOption)
-                                     .Select(f => new { Path = f, LastWriteTime = File.GetLastWriteTime(f) })
-                                     .ToList();
-                return Task.FromResult<object>(files);
+                                     .Select(f => new { Type = "File", Path = f, LastWriteTime = File.GetLastWriteTime(f) });
+                
+                var directories = Directory.GetDirectories(path, "*", searchOption)
+                                           .Select(d => new { Type = "Directory", Path = d, LastWriteTime = Directory.GetLastWriteTime(d) });
+
+                var combinedList = files.Concat<object>(directories).ToList();
+                return Task.FromResult<object>(combinedList);
             }
             catch (UnauthorizedAccessException)
             {
