@@ -1,5 +1,5 @@
 # mcpWinAudit
-[![Audited with 🔍](https://a.b-b.top/badge.svg?repo=mcpWinAudit&label=Audited%20with%20🔍&background_color=8bc34a&background_color2=9ccc65&utm_source=github&utm_medium=readme&utm_campaign=badge)](https://a.b-b.top)
+[![Audited with 🔍](https://a.b-b.top/badge.svg?repo=mcpWinAudit&label=Audited&background_color=8bc34a&background_color2=9ccc65&utm_source=github&utm_medium=readme&utm_campaign=badge)](https://a.b-b.top)
 ## Available Commands
 
 | Command | Description |
